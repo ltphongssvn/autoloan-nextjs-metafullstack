@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AutoLoan Next.js — Full-Stack Application
 
-## Getting Started
+Next.js 15 refactor of the AutoLoan Rails+Vite application with Material UI, TypeScript, and comprehensive test coverage.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Architecture
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── agreement/[id]/     # Loan agreement signing (canvas signature)
+│   ├── api/v1/             # API proxy routes → Rails backend
+│   ├── dashboard/          # Applicant dashboard, app detail, status, settings
+│   ├── forgot-password/    # Password recovery
+│   ├── login/              # Authentication
+│   ├── officer/            # Loan officer dashboard & review
+│   ├── reset-password/     # Password reset
+│   ├── signup/             # Registration
+│   └── underwriter/        # Underwriter dashboard & analysis
+├── components/             # Shared UI components
+│   ├── layout/             # AppHeader, SideDrawer, MainLayout
+│   ├── ConfirmDialog.tsx   # Reusable confirmation modal
+│   ├── EmptyState.tsx      # Empty state placeholder
+│   ├── LoadingSpinner.tsx  # Loading indicator
+│   ├── NotificationAlert.tsx # Snackbar notifications
+│   ├── ProtectedRoute.tsx  # Role-based route guard
+│   └── StatusChip.tsx      # Application status badge
+├── context/                # React context (AuthContext)
+├── hooks/                  # Custom hooks (useNotification, useCable, useChannel)
+├── services/               # API service layer
+│   ├── api.ts              # Base fetch wrapper with JWT auth
+│   ├── applications.ts     # Application CRUD + documents + signing
+│   ├── auth.ts             # Login, signup, logout, password reset
+│   ├── cable.ts            # WebSocket (ActionCable) with auto-reconnect
+│   └── staff.ts            # Loan officer & underwriter endpoints
+├── theme/                  # MUI theme configuration
+├── types/                  # TypeScript interfaces
+└── middleware.ts           # Auth + role-based route protection
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Roles & Workflows
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Applicant**: Create application → Upload documents → Track status → Sign agreement
+- **Loan Officer**: Review applications → Verify → Request documents → Forward to underwriter
+- **Underwriter**: Risk analysis (DTI/LTV) → Approve/Reject → Request documents
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting Started
+```bash
+cp env.example .env.local   # Configure API URLs
+npm install
+npm run dev                 # http://localhost:3001
+```
 
-## Learn More
+## Testing
+```bash
+npm test                    # Run all tests
+npm run test:coverage       # Coverage report (80% per-file threshold)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: Next.js 15 (App Router)
+- **UI**: Material UI 6
+- **Language**: TypeScript 5
+- **Testing**: Vitest + React Testing Library
+- **State**: React Context + hooks
+- **Real-time**: WebSocket (ActionCable compatible)
+- **Backend**: Rails API (proxied via Next.js API routes)
