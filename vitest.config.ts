@@ -30,6 +30,7 @@ export default defineConfig({
         // Barrel re-exports — no logic to test
         'src/theme/index.ts',
         'src/services/index.ts',
+        'src/components/index.ts',
         // Pure type definitions — no runtime code
         'src/types/index.ts',
       ],
