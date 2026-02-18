@@ -157,8 +157,8 @@ describe('UnderwriterAnalysisPage', () => {
     render(<UnderwriterAnalysisPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('UNDERWRITER DECISION')).toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Docs' }));
-    await waitFor(() => expect(screen.getByText('Request Documents')).toBeInTheDocument());
-    expect(screen.getByText('Request Documents', { selector: 'button' }).closest('button')).toBeDisabled();
+    await waitFor(() => expect(screen.getByText('Select Documents to Request:')).toBeInTheDocument());
+    const reqBtns = screen.getAllByRole('button', { name: /request documents/i }); expect(reqBtns[reqBtns.length - 1]).toBeDisabled();
     fireEvent.click(screen.getByLabelText('Proof of Income (Pay Stubs)'));
     fireEvent.click(screen.getByText('Request Documents', { selector: 'button span' }).closest('button')!);
     await waitFor(() => expect(mockRequestDocs).toHaveBeenCalledWith(1, ['proof_of_income'], 'Additional documents required'));
