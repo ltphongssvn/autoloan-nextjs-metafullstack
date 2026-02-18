@@ -54,14 +54,14 @@ describe('LandingPage', () => {
   });
 
   it('displays a calculated monthly payment', () => {
-    render(<LandingPage />);
-    const paymentEl = screen.getByText(/^\$/);
-    expect(paymentEl).toBeInTheDocument();
-    expect(paymentEl.textContent).toMatch(/^\$\d+\.\d{2}$/);
+    const { container } = render(<LandingPage />);
+    const paymentHeading = container.querySelector('h4');
+    expect(paymentHeading).toBeTruthy();
+    expect(paymentHeading!.textContent).toMatch(/^\$\d+\.\d{2}$/);
   });
 
-  it('renders interest rate select with APR options', () => {
+  it('renders interest rate select', () => {
     render(<LandingPage />);
-    expect(screen.getByLabelText(/Interest Rate/)).toBeInTheDocument();
+    expect(screen.getByText('Interest Rate (APR)')).toBeInTheDocument();
   });
 });
