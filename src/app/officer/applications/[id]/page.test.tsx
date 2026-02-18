@@ -54,9 +54,9 @@ const makeApp = (overrides = {}) => ({
 });
 
 const openActionSelect = async () => {
-  const selectText = screen.getByText('-- Select --');
-  const selectNode = selectText.closest('[role="combobox"]') || selectText.parentElement!;
-  fireEvent.mouseDown(selectNode);
+  const decisionCard = screen.getByText('Decision Center').closest('.MuiCard-root') as HTMLElement;
+  const selectTrigger = within(decisionCard).getByRole('combobox');
+  fireEvent.mouseDown(selectTrigger);
   await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
 };
 
