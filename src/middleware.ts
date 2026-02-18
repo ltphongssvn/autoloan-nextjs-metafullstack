@@ -1,7 +1,7 @@
 // autoloan-nextjs-metafullstack/src/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const PUBLIC_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password'];
+const PUBLIC_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/account-locked', '/confirm-email'];
 const OFFICER_PATHS = ['/officer'];
 const UNDERWRITER_PATHS = ['/underwriter'];
 

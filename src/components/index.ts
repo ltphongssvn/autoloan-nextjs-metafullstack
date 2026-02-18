@@ -6,3 +6,5 @@ export { AppHeader, SideDrawer, MainLayout } from './layout';
 export { default as NotificationAlert } from './NotificationAlert';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as EmptyState } from './EmptyState';
+export { default as MfaSettings } from './MfaSettings';
+export { default as ApplicationFilter } from './ApplicationFilter';

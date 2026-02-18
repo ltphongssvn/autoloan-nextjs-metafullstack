@@ -88,3 +88,13 @@ describe('middleware', () => {
     expect(res.headers.get('x-middleware-next')).toBe('1');
   });
 });
+
+  it('allows account-locked page', () => {
+    const res = middleware(makeReq('/account-locked'));
+    expect(res.headers.get('x-middleware-next')).toBe('1');
+  });
+
+  it('allows confirm-email page', () => {
+    const res = middleware(makeReq('/confirm-email'));
+    expect(res.headers.get('x-middleware-next')).toBe('1');
+  });
