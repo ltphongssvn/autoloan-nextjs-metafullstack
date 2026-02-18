@@ -80,8 +80,8 @@ describe('UnderwriterDashboardPage', () => {
   });
 
   it('filters by risk level', async () => {
-    // High DTI (>40) = high risk
-    const highRiskApp = makeApp(1, 'under_review', { employment_info: { income: '20000' } });
+    // High DTI (>40) = high risk; principal=25000, monthly~494, DTI=(494*12)/income*100
+    const highRiskApp = makeApp(1, 'under_review', { employment_info: { income: '10000' } });
     // Low DTI = low risk
     const lowRiskApp = makeApp(2, 'under_review', { employment_info: { income: '200000' } });
     mockList.mockResolvedValueOnce([highRiskApp, lowRiskApp] as never);
@@ -93,8 +93,8 @@ describe('UnderwriterDashboardPage', () => {
   });
 
   it('filters by medium risk', async () => {
-    // DTI 30-40 or LTV 80-90 = medium
-    const medRiskApp = makeApp(1, 'under_review', { employment_info: { income: '45000' } });
+    // DTI 30-40 = medium; monthly~494, DTI=(494*12)/16000*100≈37%
+    const medRiskApp = makeApp(1, 'under_review', { employment_info: { income: '16000' } });
     mockList.mockResolvedValueOnce([medRiskApp] as never);
     render(<UnderwriterDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
@@ -206,8 +206,8 @@ describe('UnderwriterDashboardPage', () => {
   });
 
   it('filters by high risk', async () => {
-    const highRiskApp = makeApp(1, 'under_review', { employment_info: { income: '20000' } });
-    mockList.mockResolvedValueOnce([highRiskApp] as never);
+    const highRiskApp2 = makeApp(1, 'under_review', { employment_info: { income: '10000' } });
+    mockList.mockResolvedValueOnce([highRiskApp2] as never);
     render(<UnderwriterDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
     await openFilter('All Risk', 'High Risk');
