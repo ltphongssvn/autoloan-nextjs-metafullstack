@@ -1,27 +1,24 @@
 // autoloan-nextjs-metafullstack/src/app/reset-password/page.tsx
 'use client';
-
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Card, CardContent, Typography, TextField, Button, Link, Alert } from '@mui/material';
 import { authService } from '@/services/auth';
+import { LoadingSpinner } from '@/components';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
-
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-
     if (password !== passwordConfirmation) {
       setError('Passwords do not match');
       return;
@@ -30,7 +27,6 @@ export default function ResetPasswordPage() {
       setError('Password must be at least 6 characters');
       return;
     }
-
     setIsLoading(true);
     try {
       await authService.resetPassword(token, password, passwordConfirmation);
@@ -42,7 +38,6 @@ export default function ResetPasswordPage() {
       setIsLoading(false);
     }
   };
-
   return (
     <Box
       sx={{
@@ -59,10 +54,8 @@ export default function ResetPasswordPage() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Enter your new password below.
           </Typography>
-
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
           <Box component="form" onSubmit={handleSubmit}>
             <TextField fullWidth label="New Password" type="password" value={password}
               onChange={(e) => setPassword(e.target.value)} required sx={{ mb: 2 }} />
@@ -72,7 +65,6 @@ export default function ResetPasswordPage() {
               {isLoading ? 'Resetting...' : 'Reset Password'}
             </Button>
           </Box>
-
           <Box sx={{ textAlign: 'center' }}>
             <Link component="button" variant="body2" onClick={() => router.push('/login')}>
               Back to login
@@ -81,5 +73,13 @@ export default function ResetPasswordPage() {
         </CardContent>
       </Card>
     </Box>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner message="Loading..." />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
