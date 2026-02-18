@@ -62,3 +62,40 @@ describe('useChannel', () => {
     expect(unsub).toHaveBeenCalled();
   });
 });
+
+describe('useCable - no user', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.doMock('@/context/AuthContext', () => ({
+      useAuth: () => ({ user: null, isLoading: false, isAuthenticated: false, setUser: vi.fn(), logout: vi.fn() }),
+    }));
+  });
+
+  it('does not connect without user', async () => {
+    vi.resetModules();
+    vi.doMock('@/context/AuthContext', () => ({
+      useAuth: () => ({ user: null, isLoading: false, isAuthenticated: false, setUser: vi.fn(), logout: vi.fn() }),
+    }));
+    vi.doMock('@/services/cable', () => ({
+      cableService: { connect: mockConnect, disconnect: mockDisconnect, subscribe: mockSubscribe, setStateChangeHandler: mockSetHandler },
+    }));
+    const { useCable: useCableNoUser } = await import('./useCable');
+    renderHook(() => useCableNoUser());
+    expect(mockConnect).not.toHaveBeenCalled();
+  });
+});
+
+describe('useChannel - no user', () => {
+  it('does not subscribe without user', async () => {
+    vi.resetModules();
+    vi.doMock('@/context/AuthContext', () => ({
+      useAuth: () => ({ user: null, isLoading: false, isAuthenticated: false, setUser: vi.fn(), logout: vi.fn() }),
+    }));
+    vi.doMock('@/services/cable', () => ({
+      cableService: { connect: mockConnect, disconnect: mockDisconnect, subscribe: mockSubscribe, setStateChangeHandler: mockSetHandler },
+    }));
+    const { useChannel: useChannelNoUser } = await import('./useCable');
+    renderHook(() => useChannelNoUser('Ch', {}, vi.fn()));
+    expect(mockSubscribe).not.toHaveBeenCalled();
+  });
+});
