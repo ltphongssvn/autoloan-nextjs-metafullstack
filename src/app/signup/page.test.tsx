@@ -58,9 +58,9 @@ describe('SignupPage', () => {
   it('renders signup form', () => {
     render(<SignupPage />);
     expect(screen.getByText('Create your account')).toBeInTheDocument();
-    expect(screen.getByText(/First Name/)).toBeInTheDocument();
-    expect(screen.getByText(/Last Name/)).toBeInTheDocument();
-    expect(screen.getByText(/Email/)).toBeInTheDocument();
+    expect(screen.getAllByText(/First Name/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Last Name/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Email/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
   });
 

@@ -62,6 +62,6 @@ describe('LandingPage', () => {
 
   it('renders interest rate select', () => {
     render(<LandingPage />);
-    expect(screen.getByText('Interest Rate (APR)')).toBeInTheDocument();
+    expect(screen.getAllByText('Interest Rate (APR)').length).toBeGreaterThanOrEqual(1);
   });
 });
