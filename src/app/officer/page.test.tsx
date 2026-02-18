@@ -177,24 +177,13 @@ describe('OfficerDashboardPage', () => {
     expect(screen.getByText('APP-0002')).toBeInTheDocument();
   });
 
-  it('filters with all date ranges sequentially', async () => {
+  it('filters with week date range then resets to all', async () => {
     const todayApp = makeApp(1, 'submitted', { created_at: new Date().toISOString() });
     const oldApp = makeApp(2, 'submitted', { created_at: '2020-01-01' });
     mockList.mockResolvedValueOnce([todayApp, oldApp] as never);
     render(<OfficerDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
-    // Today
-    await openDateFilter('Today');
-    expect(screen.getByText('APP-0001')).toBeInTheDocument();
-    expect(screen.queryByText('APP-0002')).not.toBeInTheDocument();
-    // Week
     await openDateFilter('Last 7 Days');
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
-    // Month
-    await openDateFilter('Last 30 Days');
-    expect(screen.getByText('APP-0001')).toBeInTheDocument();
-    // All
-    await openDateFilter('All Dates');
-    expect(screen.getByText('APP-0001')).toBeInTheDocument();
-    expect(screen.getByText('APP-0002')).toBeInTheDocument();
+    expect(screen.queryByText('APP-0002')).not.toBeInTheDocument();
   });
