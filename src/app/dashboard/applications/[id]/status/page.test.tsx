@@ -1,3 +1,4 @@
+// autoloan-nextjs-metafullstack/src/app/dashboard/applications/[id]/status/page.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import type { Application } from '@/types';
@@ -38,7 +39,7 @@ const makeApp = (overrides: Partial<Application> = {}): Application => ({
 });
 
 describe('ApplicationStatusPage', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => vi.resetAllMocks());
 
   it('renders status page with application details', async () => {
     mockGet.mockResolvedValueOnce(makeApp());
@@ -135,11 +136,8 @@ describe('ApplicationStatusPage', () => {
     mockListDocs.mockResolvedValueOnce([]);
     render(<ApplicationStatusPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Upload proof income')).toBeInTheDocument());
-    // Click triggers file input - we can verify the button works
     fireEvent.click(screen.getByText('Upload proof income'));
   });
-
-
 
   it('renders draft status with default color', async () => {
     mockGet.mockResolvedValueOnce(makeApp({ status: 'draft' }));
@@ -157,24 +155,21 @@ describe('ApplicationStatusPage', () => {
 
   it('triggers file upload and handles success', async () => {
     mockGet.mockResolvedValueOnce(makeApp({ status: 'pending_documents' }));
-    mockListDocs.mockResolvedValue([
-      { id: 10, doc_type: 'proof_income', status: 'requested' } as never,
-    ]);
+    const requestedDoc = { id: 10, doc_type: 'proof_income', status: 'requested' } as never;
+    mockListDocs.mockResolvedValueOnce([requestedDoc]);
     render(<ApplicationStatusPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText(/Upload proof/)).toBeInTheDocument());
 
     fireEvent.click(screen.getByText(/Upload proof/));
 
     mockUploadDoc.mockResolvedValueOnce({} as never);
+    mockListDocs.mockResolvedValueOnce([requestedDoc]);
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['data'], 'test.pdf', { type: 'application/pdf' });
     Object.defineProperty(fileInput, 'files', { value: [file], writable: true });
     fireEvent.change(fileInput);
     await waitFor(() => expect(mockUploadDoc).toHaveBeenCalled());
-    mockListDocs.mockReset();
   });
-
-
 
   it('ignores file change with no files', async () => {
     mockGet.mockResolvedValueOnce(makeApp({ status: 'pending_documents' }));
@@ -189,5 +184,4 @@ describe('ApplicationStatusPage', () => {
     fireEvent.change(fileInput);
     expect(mockUploadDoc).not.toHaveBeenCalled();
   });
-
 });
