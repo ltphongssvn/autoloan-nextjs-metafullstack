@@ -1,6 +1,6 @@
 // autoloan-nextjs-metafullstack/src/app/officer/applications/[id]/page.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -52,6 +52,13 @@ const makeApp = (overrides = {}) => ({
   signed_at: null, agreement_accepted: null,
   created_at: '2025-01-01', updated_at: '2025-01-15', ...overrides,
 });
+
+const openActionSelect = async () => {
+  const selectText = screen.getByText('-- Select --');
+  const selectNode = selectText.closest('[role="combobox"]') || selectText.parentElement!;
+  fireEvent.mouseDown(selectNode);
+  await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
+};
 
 describe('OfficerApplicationReviewPage', () => {
   beforeEach(() => {
@@ -144,10 +151,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockListDocs.mockResolvedValueOnce([]);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Proof Income')).toBeInTheDocument());
-    // Find the delete icon button in the table row
     const row = screen.getByText('Proof Income').closest('tr')!;
-    const buttons = row.querySelectorAll('button');
-    const deleteBtn = Array.from(buttons).find(b => b.querySelector('svg[data-testid="DeleteIcon"]'));
+    const deleteBtn = Array.from(row.querySelectorAll('button')).find(b => b.querySelector('svg[data-testid="DeleteIcon"]'));
     if (deleteBtn) fireEvent.click(deleteBtn);
     await waitFor(() => expect(mockDeleteDoc).toHaveBeenCalledWith(1, 5));
   });
@@ -169,9 +174,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockStartVerify.mockResolvedValueOnce(makeApp({ status: 'pending' }) as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Start Verification'));
+    await openActionSelect();
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Start Verification'));
     fireEvent.click(screen.getByText('Submit Decision'));
     await waitFor(() => expect(mockStartVerify).toHaveBeenCalledWith(1));
   });
@@ -182,9 +186,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockForward.mockResolvedValueOnce(makeApp({ status: 'under_review' }) as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Forward to Underwriter'));
+    await openActionSelect();
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Forward to Underwriter'));
     fireEvent.change(screen.getByPlaceholderText('Notes...'), { target: { value: 'Looks good' } });
     fireEvent.click(screen.getByText('Submit Decision'));
     await waitFor(() => expect(mockForward).toHaveBeenCalledWith(1));
@@ -196,9 +199,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockRequestDocs.mockResolvedValueOnce(undefined);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Request Documents'));
+    await openActionSelect();
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Request Documents'));
     fireEvent.click(screen.getByText('Submit Decision'));
     await waitFor(() => expect(screen.getByText('Request Additional Documents')).toBeInTheDocument());
     fireEvent.click(screen.getByLabelText('Bank Statements (3 months)'));
@@ -211,9 +213,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Request Documents'));
+    await openActionSelect();
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Request Documents'));
     fireEvent.click(screen.getByText('Submit Decision'));
     await waitFor(() => expect(screen.getByText('Request Additional Documents')).toBeInTheDocument());
     fireEvent.click(screen.getByText('Cancel'));
@@ -250,9 +251,8 @@ describe('OfficerApplicationReviewPage', () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Request Documents'));
+    await openActionSelect();
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Request Documents'));
     fireEvent.click(screen.getByText('Submit Decision'));
     await waitFor(() => expect(screen.getByText('Request Additional Documents')).toBeInTheDocument());
     fireEvent.click(screen.getByLabelText('Other'));
@@ -264,8 +264,7 @@ describe('OfficerApplicationReviewPage', () => {
     mockGet.mockResolvedValueOnce(makeApp({ status: 'pending' }) as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Action'));
-    await waitFor(() => expect(screen.getByRole('listbox')).toBeInTheDocument());
-    expect(screen.getByText('Forward to Underwriter')).toBeInTheDocument();
+    await openActionSelect();
+    expect(within(screen.getByRole('listbox')).getByText('Forward to Underwriter')).toBeInTheDocument();
   });
 });
