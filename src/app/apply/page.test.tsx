@@ -26,7 +26,7 @@ describe('ApplyPage', () => {
   it('renders step 1 with pre-filled user info', () => {
     render(<ApplyPage />);
     expect(screen.getByText('Apply for Auto Loan')).toBeInTheDocument();
-    expect(screen.getByText('Personal Information')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Personal Information' })).toBeInTheDocument();
     expect(screen.getByDisplayValue('John')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Doe')).toBeInTheDocument();
   });
@@ -43,13 +43,13 @@ describe('ApplyPage', () => {
     // Fill step 1
     fireEvent.change(screen.getByLabelText(/Date of Birth/), { target: { value: '1990-01-01' } });
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Employment Details')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Employment Details' })).toBeInTheDocument();
 
     // Fill step 2
     fireEvent.change(screen.getByLabelText(/Employer/), { target: { value: 'Acme' } });
     fireEvent.change(screen.getByLabelText(/Annual Income/), { target: { value: '80000' } });
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Vehicle Information')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Vehicle Information' })).toBeInTheDocument();
 
     // Fill step 3
     fireEvent.change(screen.getByLabelText(/Make/), { target: { value: 'Toyota' } });
@@ -57,13 +57,13 @@ describe('ApplyPage', () => {
     fireEvent.change(screen.getByLabelText(/Year/), { target: { value: '2024' } });
     fireEvent.change(screen.getByLabelText(/Price/), { target: { value: '35000' } });
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Loan Details')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Loan Details' })).toBeInTheDocument();
 
     // Fill step 4
     fireEvent.change(screen.getByLabelText(/Loan Amount/), { target: { value: '30000' } });
     fireEvent.change(screen.getByLabelText(/Down Payment/), { target: { value: '5000' } });
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Review Your Application')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Review Your Application' })).toBeInTheDocument();
   });
 
   it('validates step 2 required fields', () => {
@@ -108,9 +108,9 @@ describe('ApplyPage', () => {
     render(<ApplyPage />);
     fireEvent.change(screen.getByLabelText(/Date of Birth/), { target: { value: '1990-01-01' } });
     fireEvent.click(screen.getByText('Next'));
-    expect(screen.getByText('Employment Details')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Employment Details' })).toBeInTheDocument();
     fireEvent.click(screen.getByText('Back'));
-    expect(screen.getByText('Personal Information')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Personal Information' })).toBeInTheDocument();
   });
 
   it('saves draft', async () => {
