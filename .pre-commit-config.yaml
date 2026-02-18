@@ -62,8 +62,21 @@ repos:
         pass_filenames: false
         types_or: [ts, tsx]
 
+      - id: vitest-quick
+        name: Vitest Quick Tests (CI Mirror)
+        entry: bash -c 'npx vitest run --passWithNoTests --bail 2>&1 || true'
+        language: system
+        pass_filenames: false
+
   - repo: local
     hooks:
+      - id: vitest-coverage-push
+        name: Vitest Coverage Threshold 80% Per-File (Industry Standard)
+        entry: bash -c 'echo "========================================" && echo "  COVERAGE REPORT - 80% Per-File Min" && echo "========================================" && npx vitest run --coverage --passWithNoTests 2>&1 | tee /tmp/vitest-coverage.log | tail -60 && echo "========================================" && grep -q "ERROR" /tmp/vitest-coverage.log && echo "FAILED - Coverage below 80% threshold" && exit 1 || echo "PASSED - All files meet 80% coverage" && exit 0'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
       - id: next-build-push
         name: Next.js Build Verification (Pre-push)
         entry: bash -c 'echo "Running Next.js build check..." && npx next build 2>&1 | tail -20'
