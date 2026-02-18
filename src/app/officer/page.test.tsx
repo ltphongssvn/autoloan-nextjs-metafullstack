@@ -187,3 +187,33 @@ describe('OfficerDashboardPage', () => {
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
     expect(screen.queryByText('APP-0002')).not.toBeInTheDocument();
   });
+
+  it('searches with apps that have null personal_info', async () => {
+    mockList.mockResolvedValueOnce([
+      makeApp(1, 'submitted', { personal_info: null }),
+      makeApp(2, 'submitted', { personal_info: { first_name: 'Alice', last_name: 'Smith' } }),
+    ] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+    fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'Alice' } });
+    expect(screen.queryByText('APP-0001')).not.toBeInTheDocument();
+    expect(screen.getByText('APP-0002')).toBeInTheDocument();
+  });
+
+  it('searches with apps missing first_name and last_name', async () => {
+    mockList.mockResolvedValueOnce([
+      makeApp(1, 'submitted', { personal_info: {} }),
+      makeApp(2, 'submitted'),
+    ] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+    fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'John' } });
+    expect(screen.queryByText('APP-0001')).not.toBeInTheDocument();
+    expect(screen.getByText('APP-0002')).toBeInTheDocument();
+  });
+
+  it('renders apps with missing loan_details', async () => {
+    mockList.mockResolvedValueOnce([makeApp(1, 'submitted', { loan_details: null })] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+  });
