@@ -48,7 +48,6 @@ function ApplyContent() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-
   const update = (field: keyof FormData) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { value: string } }) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
@@ -80,7 +79,6 @@ function ApplyContent() {
         car_details: { make: form.make, model: form.model, year: form.year, price: form.price, mileage: form.mileage, vin: form.vin },
         loan_details: { amount: form.amount, down_payment: form.down_payment },
       } as never);
-
       router.push(`/dashboard/applications/${app.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save application.');
@@ -100,7 +98,6 @@ function ApplyContent() {
         loan_details: { amount: form.amount, down_payment: form.down_payment },
       } as never);
       await applicationsService.submit(app.id);
-
       setStep(5);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit application.');
@@ -257,7 +254,7 @@ function ApplyContent() {
 
 export default function ApplyPage() {
   return (
-    <ProtectedRoute allowedRoles={['applicant']}>
+    <ProtectedRoute allowedRoles={['customer']}>
       <ApplyContent />
     </ProtectedRoute>
   );
