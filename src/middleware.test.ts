@@ -47,12 +47,12 @@ describe('middleware', () => {
   });
 
   it('allows authenticated user to dashboard', () => {
-    const res = middleware(makeReq('/dashboard', { token: 'abc', user_role: 'applicant' }));
+    const res = middleware(makeReq('/dashboard', { token: 'abc', user_role: 'customer' }));
     expect(res.headers.get('x-middleware-next')).toBe('1');
   });
 
   it('redirects non-officer from officer paths', () => {
-    const res = middleware(makeReq('/officer', { token: 'abc', user_role: 'applicant' }));
+    const res = middleware(makeReq('/officer', { token: 'abc', user_role: 'customer' }));
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('/dashboard');
   });
@@ -63,7 +63,7 @@ describe('middleware', () => {
   });
 
   it('redirects non-underwriter from underwriter paths', () => {
-    const res = middleware(makeReq('/underwriter', { token: 'abc', user_role: 'applicant' }));
+    const res = middleware(makeReq('/underwriter', { token: 'abc', user_role: 'customer' }));
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('/dashboard');
   });
@@ -84,7 +84,7 @@ describe('middleware', () => {
   });
 
   it('allows agreement page for authenticated user', () => {
-    const res = middleware(makeReq('/agreement/1', { token: 'abc', user_role: 'applicant' }));
+    const res = middleware(makeReq('/agreement/1', { token: 'abc', user_role: 'customer' }));
     expect(res.headers.get('x-middleware-next')).toBe('1');
   });
 });

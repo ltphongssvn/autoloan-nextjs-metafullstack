@@ -7,7 +7,7 @@ vi.mock('next/navigation', () => ({
   useServerInsertedHTML: vi.fn(),
 }));
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 1, first_name: 'John', role: 'applicant' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
+  useAuth: () => ({ user: { id: 1, first_name: 'John', role: 'customer' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('react', async () => {

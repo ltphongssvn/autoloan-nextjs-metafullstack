@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 1, role: 'applicant' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
+  useAuth: () => ({ user: { id: 1, role: 'customer' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
 }));
 
 const mockConnect = vi.fn();

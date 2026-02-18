@@ -8,7 +8,7 @@ vi.mock('next/navigation', () => ({
   useServerInsertedHTML: vi.fn(),
 }));
 
-const mockUser = { id: 1, first_name: 'John', last_name: 'Doe', role: 'applicant' };
+const mockUser = { id: 1, first_name: 'John', last_name: 'Doe', role: 'customer' };
 let currentUser: typeof mockUser | null = mockUser;
 
 vi.mock('@/context/AuthContext', () => ({
@@ -23,7 +23,7 @@ describe('SideDrawer', () => {
 
   it('renders applicant nav items', () => {
     render(<SideDrawer open={true} onClose={vi.fn()} />);
-    expect(screen.getByText('Applicant Portal')).toBeInTheDocument();
+    expect(screen.getByText('Customer Portal')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });

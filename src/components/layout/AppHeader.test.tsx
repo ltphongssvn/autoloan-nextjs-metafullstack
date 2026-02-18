@@ -9,7 +9,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 const mockLogout = vi.fn();
-const mockUser = { id: 1, first_name: 'John', last_name: 'Doe', role: 'applicant' };
+const mockUser = { id: 1, first_name: 'John', last_name: 'Doe', role: 'customer' };
 let currentUser: typeof mockUser | null = mockUser;
 
 vi.mock('@/context/AuthContext', () => ({

@@ -7,7 +7,7 @@ vi.mock('next/navigation', () => ({
   useServerInsertedHTML: vi.fn(),
 }));
 vi.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 1, first_name: 'John', last_name: 'Doe', role: 'applicant' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
+  useAuth: () => ({ user: { id: 1, first_name: 'John', last_name: 'Doe', role: 'customer' }, isLoading: false, isAuthenticated: true, setUser: vi.fn(), logout: vi.fn() }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('@/services/auth', () => ({
@@ -26,7 +26,7 @@ describe('MainLayout', () => {
   it('opens drawer on menu click', () => {
     render(<MainLayout><div>Content</div></MainLayout>);
     fireEvent.click(screen.getByLabelText('menu'));
-    expect(screen.getByText('Applicant Portal')).toBeInTheDocument();
+    expect(screen.getByText('Customer Portal')).toBeInTheDocument();
   });
 
   it('renders without drawer when showDrawer is false', () => {
@@ -38,7 +38,7 @@ describe('MainLayout', () => {
   it('closes drawer when nav item clicked', async () => {
     render(<MainLayout><div>Content</div></MainLayout>);
     fireEvent.click(screen.getByLabelText('menu'));
-    expect(screen.getByText('Applicant Portal')).toBeInTheDocument();
+    expect(screen.getByText('Customer Portal')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Dashboard'));
     // Drawer close triggered
   });
