@@ -112,6 +112,11 @@ function ApplicationStepperContent({ id }: { id: number }) {
     }
   };
 
+  const handleSelectChange = (setter: React.Dispatch<React.SetStateAction<Record<string, string>>>, field: string) =>
+    (e: { target: { value: string } }) => {
+      setter((prev) => ({ ...prev, [field]: e.target.value }));
+    };
+
   const handleChange = (setter: React.Dispatch<React.SetStateAction<Record<string, string>>>) =>
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string } }) => {
       setter((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -150,7 +155,7 @@ function ApplicationStepperContent({ id }: { id: number }) {
                   <Grid size={{ xs: 12, sm: 5 }}><TextField fullWidth label="City" name="city" value={personalInfo.city || ''} onChange={handleChange(setPersonalInfo)} /></Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
                     <FormControl fullWidth><InputLabel>State</InputLabel>
-                      <Select name="state" value={personalInfo.state || ''} label="State" onChange={(e) => setPersonalInfo((p) => ({ ...p, state: e.target.value }))}>
+                      <Select name="state" value={personalInfo.state || ''} label="State" onChange={handleSelectChange(setPersonalInfo, "state")}>
                         {US_STATES.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                       </Select>
                     </FormControl>
@@ -167,7 +172,7 @@ function ApplicationStepperContent({ id }: { id: number }) {
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth><InputLabel>Make</InputLabel>
-                      <Select name="make" value={carDetails.make || ''} label="Make" onChange={(e) => setCarDetails((p) => ({ ...p, make: e.target.value }))}>
+                      <Select name="make" value={carDetails.make || ''} label="Make" onChange={handleSelectChange(setCarDetails, "make")}>
                         {VEHICLE_MAKES.map((m) => <MenuItem key={m} value={m}>{m}</MenuItem>)}
                       </Select>
                     </FormControl>
@@ -175,7 +180,7 @@ function ApplicationStepperContent({ id }: { id: number }) {
                   <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label="Trim Level" name="trim" value={carDetails.trim || ''} onChange={handleChange(setCarDetails)} /></Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth><InputLabel>Year</InputLabel>
-                      <Select name="year" value={carDetails.year || ''} label="Year" onChange={(e) => setCarDetails((p) => ({ ...p, year: e.target.value }))}>
+                      <Select name="year" value={carDetails.year || ''} label="Year" onChange={handleSelectChange(setCarDetails, "year")}>
                         {VEHICLE_YEARS.map((y) => <MenuItem key={y} value={y}>{y}</MenuItem>)}
                       </Select>
                     </FormControl>

@@ -1,11 +1,9 @@
-// autoloan-nextjs-metafullstack/src/app/layout.test.tsx
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('next/navigation', () => ({
   useServerInsertedHTML: vi.fn((cb: () => void) => cb()),
 }));
-
 vi.mock('@/context/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -14,6 +12,8 @@ import RootLayout from './layout';
 
 describe('RootLayout', () => {
   it('renders children content', () => {
+    const originalError = console.error;
+    console.error = vi.fn();
     render(
       <RootLayout>
         <div data-testid="child">Test Content</div>
@@ -21,6 +21,7 @@ describe('RootLayout', () => {
     );
     expect(screen.getByTestId('child')).toBeInTheDocument();
     expect(screen.getByText('Test Content')).toBeInTheDocument();
+    console.error = originalError;
   });
 
   it('exports metadata with correct title and description', async () => {
