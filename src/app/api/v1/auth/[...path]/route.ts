@@ -26,6 +26,7 @@ async function proxyToRails(req: NextRequest, params: Promise<{ path: string[] }
 
   const responseHeaders: Record<string, string> = {
     'Content-Type': res.headers.get('Content-Type') || 'application/json',
+    'Access-Control-Expose-Headers': 'Authorization',
   };
 
   const resAuth = res.headers.get('authorization');
