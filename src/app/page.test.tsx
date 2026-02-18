@@ -2,39 +2,44 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('next/image', () => ({
-  default: (props: Record<string, unknown>) => {
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img {...props} />;
-  },
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush, back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+  useServerInsertedHTML: vi.fn(),
 }));
 
-import Home from './page';
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ user: null, isLoading: false, setUser: vi.fn(), logout: vi.fn(), isAuthenticated: false }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
-describe('Home Page', () => {
+import LandingPage from './page';
+
+describe('LandingPage', () => {
   it('renders the heading', () => {
-    render(<Home />);
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    render(<LandingPage />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Get Your Auto Loan in 15 minutes');
   });
 
-  it('renders the Next.js logo', () => {
-    render(<Home />);
-    expect(screen.getByAltText('Next.js logo')).toBeInTheDocument();
+  it('renders Auto Loan brand text', () => {
+    render(<LandingPage />);
+    expect(screen.getByText('Auto Loan')).toBeInTheDocument();
   });
 
-  it('renders Deploy Now link', () => {
-    render(<Home />);
-    expect(screen.getByText('Deploy Now')).toBeInTheDocument();
+  it('renders Login button', () => {
+    render(<LandingPage />);
+    expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  it('renders Documentation link', () => {
-    render(<Home />);
-    expect(screen.getByText('Documentation')).toBeInTheDocument();
+  it('renders Apply Now buttons', () => {
+    render(<LandingPage />);
+    const applyButtons = screen.getAllByText('Apply Now');
+    expect(applyButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders Templates and Learning links', () => {
-    render(<Home />);
-    expect(screen.getByText('Templates')).toBeInTheDocument();
-    expect(screen.getByText('Learning')).toBeInTheDocument();
+  it('renders payment calculator', () => {
+    render(<LandingPage />);
+    expect(screen.getByText('Calculate Your Payments')).toBeInTheDocument();
+    expect(screen.getByText('Your Monthly Payment')).toBeInTheDocument();
   });
 });
