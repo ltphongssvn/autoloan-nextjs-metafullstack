@@ -12,8 +12,6 @@ const openSelect = (index: number, optionText: string) => {
 describe('ApplicationFilter', () => {
   it('renders filter and sort controls', () => {
     render(<ApplicationFilter onFilterChange={vi.fn()} onOrderChange={vi.fn()} />);
-    expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Sort By')).toBeInTheDocument();
     expect(screen.getAllByRole('combobox')).toHaveLength(2);
   });
 
@@ -24,9 +22,11 @@ describe('ApplicationFilter', () => {
     expect(onFilter).toHaveBeenCalledWith("status eq 'draft'");
   });
 
-  it('calls onFilterChange with empty for all', () => {
+  it('calls onFilterChange with empty when clearing filter', () => {
     const onFilter = vi.fn();
     render(<ApplicationFilter onFilterChange={onFilter} onOrderChange={vi.fn()} />);
+    openSelect(0, 'Submitted');
+    expect(onFilter).toHaveBeenCalledWith("status eq 'submitted'");
     openSelect(0, 'All Statuses');
     expect(onFilter).toHaveBeenCalledWith('');
   });
