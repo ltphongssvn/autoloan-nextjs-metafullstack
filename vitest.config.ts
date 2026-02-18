@@ -25,6 +25,13 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/**/*.test.{ts,tsx}',
         'src/**/*.spec.{ts,tsx}',
+        // SSR plumbing — style flush logic requires real SSR runtime, not testable in happy-dom
+        'src/theme/EmotionCache.tsx',
+        // Barrel re-exports — no logic to test
+        'src/theme/index.ts',
+        'src/services/index.ts',
+        // Pure type definitions — no runtime code
+        'src/types/index.ts',
       ],
       thresholds: {
         statements: 80,
