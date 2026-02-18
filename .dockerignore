@@ -1,0 +1,13 @@
+# autoloan-nextjs-metafullstack/.dockerignore
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env*
+coverage
+.idea
+.vscode
+*.test.ts
+*.test.tsx
+__tests__
