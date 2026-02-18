@@ -17,9 +17,18 @@ async function proxyToRails(req: NextRequest, path: string) {
   });
 
   const data = await res.text();
+
+  const responseHeaders: Record<string, string> = {
+    'Content-Type': res.headers.get('Content-Type') || 'application/json',
+  };
+
+  // Forward JWT token from Rails response
+  const resAuth = res.headers.get('authorization');
+  if (resAuth) responseHeaders['Authorization'] = resAuth;
+
   return new NextResponse(data, {
     status: res.status,
-    headers: { 'Content-Type': res.headers.get('Content-Type') || 'application/json' },
+    headers: responseHeaders,
   });
 }
 
