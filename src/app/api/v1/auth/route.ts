@@ -20,6 +20,7 @@ async function proxyToRails(req: NextRequest, path: string) {
 
   const responseHeaders: Record<string, string> = {
     'Content-Type': res.headers.get('Content-Type') || 'application/json',
+    'Access-Control-Expose-Headers': 'Authorization',
   };
 
   // Forward JWT token from Rails response
