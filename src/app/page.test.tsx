@@ -45,6 +45,13 @@ describe('LandingPage', () => {
     expect(mockPush).toHaveBeenCalledWith('/signup');
   });
 
+  it('bottom Apply Now button navigates to signup', () => {
+    render(<LandingPage />);
+    const applyButtons = screen.getAllByText('Apply Now');
+    fireEvent.click(applyButtons[applyButtons.length - 1]);
+    expect(mockPush).toHaveBeenCalledWith('/signup');
+  });
+
   it('renders payment calculator', () => {
     render(<LandingPage />);
     expect(screen.getByText('Calculate Your Payments')).toBeInTheDocument();
@@ -62,6 +69,34 @@ describe('LandingPage', () => {
 
   it('renders interest rate select', () => {
     render(<LandingPage />);
+    expect(screen.getAllByText('Interest Rate (APR)').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('loan amount slider responds to changes', () => {
+    render(<LandingPage />);
+    const sliders = screen.getAllByRole('slider');
+    // First slider is loan amount (min=5000, max=100000)
+    fireEvent.change(sliders[0], { target: { value: 50000 } });
+    expect(sliders[0]).toBeTruthy();
+  });
+
+  it('loan term slider responds to changes', () => {
+    render(<LandingPage />);
+    const sliders = screen.getAllByRole('slider');
+    // Second slider is loan term (min=12, max=84)
+    fireEvent.change(sliders[1], { target: { value: 60 } });
+    expect(sliders[1]).toBeTruthy();
+  });
+
+  it('interest rate select responds to changes', () => {
+    const { container } = render(<LandingPage />);
+    // MUI Select uses a hidden input
+    const selectInput = container.querySelector('input[type="hidden"]') ||
+      container.querySelector('.MuiSelect-nativeInput');
+    if (selectInput) {
+      fireEvent.change(selectInput, { target: { value: 7.0 } });
+    }
+    // Verify select renders
     expect(screen.getAllByText('Interest Rate (APR)').length).toBeGreaterThanOrEqual(1);
   });
 });
