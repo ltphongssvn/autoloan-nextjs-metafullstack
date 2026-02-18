@@ -160,7 +160,7 @@ describe('UnderwriterAnalysisPage', () => {
     await waitFor(() => expect(screen.getByText('Select Documents to Request:')).toBeInTheDocument());
     const reqBtns = screen.getAllByRole('button', { name: /request documents/i }); expect(reqBtns[reqBtns.length - 1]).toBeDisabled();
     fireEvent.click(screen.getByLabelText('Proof of Income (Pay Stubs)'));
-    fireEvent.click(screen.getByText('Request Documents', { selector: 'button span' }).closest('button')!);
+    const submitBtns2 = screen.getAllByRole('button', { name: /request documents/i }); fireEvent.click(submitBtns2[submitBtns2.length - 1]);
     await waitFor(() => expect(mockRequestDocs).toHaveBeenCalledWith(1, ['proof_of_income'], 'Additional documents required'));
   });
 
