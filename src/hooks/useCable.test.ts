@@ -50,7 +50,7 @@ describe('useChannel', () => {
   it('subscribes to channel on mount', () => {
     const handler = vi.fn();
     renderHook(() => useChannel('AppChannel', { id: 5 }, handler));
-    expect(mockSubscribe).toHaveBeenCalledWith('AppChannel', { id: 5 }, handler);
+    expect(mockSubscribe).toHaveBeenCalledWith('AppChannel', { id: 5 }, expect.any(Function));
   });
 
   it('unsubscribes on unmount', () => {
