@@ -151,3 +151,50 @@ describe('OfficerDashboardPage', () => {
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
   });
 });
+
+  it('handles logout when authService.logout throws', async () => {
+    mockList.mockResolvedValueOnce([] as never);
+    mockLogout.mockRejectedValueOnce(new Error('logout fail'));
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('Officer Dashboard')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /logout/i }));
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'));
+  });
+
+  it('does not show pagination when fewer than 10 apps', async () => {
+    mockList.mockResolvedValueOnce([makeApp(1)] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Go to page 2' })).not.toBeInTheDocument();
+  });
+
+  it('searches by app ID', async () => {
+    mockList.mockResolvedValueOnce([makeApp(1), makeApp(2)] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+    fireEvent.change(screen.getByPlaceholderText('Search...'), { target: { value: 'APP-0002' } });
+    expect(screen.queryByText('APP-0001')).not.toBeInTheDocument();
+    expect(screen.getByText('APP-0002')).toBeInTheDocument();
+  });
+
+  it('filters with all date ranges sequentially', async () => {
+    const todayApp = makeApp(1, 'submitted', { created_at: new Date().toISOString() });
+    const oldApp = makeApp(2, 'submitted', { created_at: '2020-01-01' });
+    mockList.mockResolvedValueOnce([todayApp, oldApp] as never);
+    render(<OfficerDashboardPage />);
+    await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
+    // Today
+    await openDateFilter('Today');
+    expect(screen.getByText('APP-0001')).toBeInTheDocument();
+    expect(screen.queryByText('APP-0002')).not.toBeInTheDocument();
+    // Week
+    await openDateFilter('Last 7 Days');
+    expect(screen.getByText('APP-0001')).toBeInTheDocument();
+    // Month
+    await openDateFilter('Last 30 Days');
+    expect(screen.getByText('APP-0001')).toBeInTheDocument();
+    // All
+    await openDateFilter('All Dates');
+    expect(screen.getByText('APP-0001')).toBeInTheDocument();
+    expect(screen.getByText('APP-0002')).toBeInTheDocument();
+  });
