@@ -45,7 +45,9 @@ describe('OfficerDashboardPage', () => {
     await waitFor(() => expect(screen.getByText('Officer Dashboard')).toBeInTheDocument());
     expect(screen.getByText('Welcome, Jane')).toBeInTheDocument();
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument(); // stats
+    expect(screen.getByText('Pending Review')).toBeInTheDocument();
+    expect(screen.getByText('New Applications')).toBeInTheDocument();
+    expect(screen.getByText('Verifying')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -78,7 +80,8 @@ describe('OfficerDashboardPage', () => {
     mockList.mockResolvedValueOnce([oldApp, newApp] as never);
     render(<OfficerDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Date Range'));
+    const dateSelect = screen.getByRole('combobox', { name: 'Date Range' });
+    fireEvent.mouseDown(dateSelect);
     fireEvent.click(screen.getByRole('option', { name: 'Last 7 Days' }));
     expect(screen.queryByText('APP-0001')).not.toBeInTheDocument();
     expect(screen.getByText('APP-0002')).toBeInTheDocument();
@@ -131,7 +134,8 @@ describe('OfficerDashboardPage', () => {
     mockList.mockResolvedValueOnce([todayApp] as never);
     render(<OfficerDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Date Range'));
+    const dateSelect = screen.getByRole('combobox', { name: 'Date Range' });
+    fireEvent.mouseDown(dateSelect);
     fireEvent.click(screen.getByRole('option', { name: 'Today' }));
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
   });
@@ -141,7 +145,8 @@ describe('OfficerDashboardPage', () => {
     mockList.mockResolvedValueOnce([recentApp] as never);
     render(<OfficerDashboardPage />);
     await waitFor(() => expect(screen.getByText('APP-0001')).toBeInTheDocument());
-    fireEvent.mouseDown(screen.getByLabelText('Date Range'));
+    const dateSelect = screen.getByRole('combobox', { name: 'Date Range' });
+    fireEvent.mouseDown(dateSelect);
     fireEvent.click(screen.getByRole('option', { name: 'Last 30 Days' }));
     expect(screen.getByText('APP-0001')).toBeInTheDocument();
   });
