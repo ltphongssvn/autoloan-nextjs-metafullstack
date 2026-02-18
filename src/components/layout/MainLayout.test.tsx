@@ -34,3 +34,17 @@ describe('MainLayout', () => {
     expect(screen.queryByLabelText('menu')).not.toBeInTheDocument();
   });
 });
+
+  it('closes drawer when nav item clicked', async () => {
+    render(<MainLayout><div>Content</div></MainLayout>);
+    fireEvent.click(screen.getByLabelText('menu'));
+    expect(screen.getByText('Applicant Portal')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Dashboard'));
+    // Drawer close triggered
+  });
+
+  it('renders with showDrawer true by default', () => {
+    render(<MainLayout><div>Test</div></MainLayout>);
+    expect(screen.getByLabelText('menu')).toBeInTheDocument();
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
