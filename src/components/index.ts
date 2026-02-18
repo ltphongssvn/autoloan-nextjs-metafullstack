@@ -2,3 +2,4 @@
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as StatusChip } from './StatusChip';
 export { default as LoadingSpinner } from './LoadingSpinner';
+export { AppHeader, SideDrawer, MainLayout } from './layout';
