@@ -242,7 +242,7 @@ function AgreementContent({ id }: { id: number }) {
 export default function AgreementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <ProtectedRoute allowedRoles={['applicant']}>
+    <ProtectedRoute allowedRoles={['customer']}>
       <AgreementContent id={Number(id)} />
     </ProtectedRoute>
   );

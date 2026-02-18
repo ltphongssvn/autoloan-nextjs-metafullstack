@@ -54,7 +54,7 @@ export default function SideDrawer({ open, onClose, variant = 'temporary' }: Sid
   };
 
   const navItems = getNavItems();
-  const roleLabel = user?.role === 'loan_officer' ? 'Loan Officer' : user?.role === 'underwriter' ? 'Underwriter' : 'Applicant';
+  const roleLabel = user?.role === 'loan_officer' ? 'Loan Officer' : user?.role === 'underwriter' ? 'Underwriter' : 'Customer';
 
   return (
     <Drawer variant={variant} open={open} onClose={onClose}

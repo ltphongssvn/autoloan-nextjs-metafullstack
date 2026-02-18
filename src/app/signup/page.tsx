@@ -27,7 +27,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'borrower',
+    role: 'customer',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
