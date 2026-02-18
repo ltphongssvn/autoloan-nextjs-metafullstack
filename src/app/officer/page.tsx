@@ -55,9 +55,12 @@ function OfficerDashboardContent() {
   const dateFiltered = useMemo(() => {
     if (dateFilter === 'all') return statusFiltered;
     const cutoff = new Date();
-    if (dateFilter === 'today') cutoff.setHours(0, 0, 0, 0);
-    else if (dateFilter === 'week') cutoff.setDate(cutoff.getDate() - 7);
-    else if (dateFilter === 'month') cutoff.setMonth(cutoff.getMonth() - 1);
+    const adjusters: Record<string, () => void> = {
+      today: () => cutoff.setHours(0, 0, 0, 0),
+      week: () => cutoff.setDate(cutoff.getDate() - 7),
+      month: () => cutoff.setMonth(cutoff.getMonth() - 1),
+    };
+    adjusters[dateFilter]?.();
     return statusFiltered.filter((a) => new Date(a.created_at) >= cutoff);
   }, [statusFiltered, dateFilter]);
 
