@@ -25,6 +25,31 @@ import { authService } from '@/services/auth';
 
 const mockSignup = vi.mocked(authService.signup);
 
+const fillForm = () => {
+  const inputs = screen.getAllByRole('textbox');
+  // First Name, Last Name, Phone, Email are textboxes
+  fireEvent.change(inputs[0], { target: { value: 'John' } });
+  fireEvent.change(inputs[1], { target: { value: 'Doe' } });
+  fireEvent.change(inputs[2], { target: { value: '555-1234' } });
+  fireEvent.change(inputs[3], { target: { value: 'j@d.com' } });
+
+  // Password fields are type="password", not textbox role
+  const passwordInputs = document.querySelectorAll('input[type="password"]');
+  fireEvent.change(passwordInputs[0], { target: { value: 'abc123' } }); // pragma: allowlist secret
+  fireEvent.change(passwordInputs[1], { target: { value: 'abc123' } }); // pragma: allowlist secret
+};
+
+const fillFormMismatch = () => {
+  const inputs = screen.getAllByRole('textbox');
+  fireEvent.change(inputs[0], { target: { value: 'John' } });
+  fireEvent.change(inputs[1], { target: { value: 'Doe' } });
+  fireEvent.change(inputs[3], { target: { value: 'j@d.com' } });
+
+  const passwordInputs = document.querySelectorAll('input[type="password"]');
+  fireEvent.change(passwordInputs[0], { target: { value: 'abc123' } }); // pragma: allowlist secret
+  fireEvent.change(passwordInputs[1], { target: { value: 'xyz789' } }); // pragma: allowlist secret
+};
+
 describe('SignupPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -33,9 +58,9 @@ describe('SignupPage', () => {
   it('renders signup form', () => {
     render(<SignupPage />);
     expect(screen.getByText('Create your account')).toBeInTheDocument();
-    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/last name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByText(/First Name/)).toBeInTheDocument();
+    expect(screen.getByText(/Last Name/)).toBeInTheDocument();
+    expect(screen.getByText(/Email/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
   });
 
@@ -48,12 +73,7 @@ describe('SignupPage', () => {
 
   it('shows error when passwords do not match', async () => {
     render(<SignupPage />);
-
-    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'j@d.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'abc123' } }); // pragma: allowlist secret
-    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'xyz789' } }); // pragma: allowlist secret
+    fillFormMismatch();
     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {
@@ -67,12 +87,7 @@ describe('SignupPage', () => {
     mockSignup.mockResolvedValueOnce(mockUser as never);
 
     render(<SignupPage />);
-
-    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'j@d.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'abc123' } }); // pragma: allowlist secret
-    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'abc123' } }); // pragma: allowlist secret
+    fillForm();
     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {
@@ -86,12 +101,7 @@ describe('SignupPage', () => {
     mockSignup.mockRejectedValueOnce(new Error('Email taken'));
 
     render(<SignupPage />);
-
-    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'j@d.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'abc123' } }); // pragma: allowlist secret
-    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'abc123' } }); // pragma: allowlist secret
+    fillForm();
     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     await waitFor(() => {
