@@ -31,3 +31,10 @@ describe('Officer Staff API Route', () => {
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/loan_officer/applications/1/verify'), expect.anything());
   });
 });
+
+  it('POST defaults action and id when missing', async () => {
+    mockFetch.mockResolvedValueOnce({ status: 200, text: () => Promise.resolve('{}'), headers: new Headers() });
+    const req = new NextRequest('http://localhost/api/v1/staff/officer', { method: 'POST', body: '{}' });
+    await POST(req);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/loan_officer/applications//'), expect.anything());
+  });

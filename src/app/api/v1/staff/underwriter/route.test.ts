@@ -31,3 +31,10 @@ describe('Underwriter Staff API Route', () => {
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/underwriter/applications/3/approve'), expect.anything());
   });
 });
+
+  it('POST defaults action and id when missing', async () => {
+    mockFetch.mockResolvedValueOnce({ status: 200, text: () => Promise.resolve('{}'), headers: new Headers() });
+    const req = new NextRequest('http://localhost/api/v1/staff/underwriter', { method: 'POST', body: '{}' });
+    await POST(req);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/underwriter/applications//'), expect.anything());
+  });
