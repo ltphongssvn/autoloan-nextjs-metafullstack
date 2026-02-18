@@ -149,6 +149,9 @@ function AgreementContent({ id }: { id: number }) {
           </Alert>
         )}
 
+        {error && application && (
+          <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+        )}
         {application.status !== 'approved' && !signed && (
           <Alert severity="warning" sx={{ mb: 3 }}>
             This application has not been approved yet. Agreement signing is not available.
