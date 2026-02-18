@@ -26,7 +26,6 @@ describe('Auth Service', () => {
       });
 
       const creds = { email: 'test@test.com', password: 'testpass1' }; // pragma: allowlist secret
-
       const result = await authService.login(creds);
 
       expect(mockApiFetch).toHaveBeenCalledWith('/auth/login', {
@@ -75,8 +74,7 @@ describe('Auth Service', () => {
     it('clears token even if API call fails', async () => {
       mockApiFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await authService.logout();
-
+      await expect(authService.logout()).rejects.toThrow('Network error');
       expect(setAuthToken).toHaveBeenCalledWith(null);
     });
   });
