@@ -2,7 +2,6 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -33,6 +32,8 @@ export default defineConfig({
         'src/components/index.ts',
         // Pure type definitions — no runtime code
         'src/types/index.ts',
+        // Prisma client singleton — runtime DB connector, not unit-testable
+        'src/lib/prisma.ts',
       ],
       thresholds: {
         statements: 80,
