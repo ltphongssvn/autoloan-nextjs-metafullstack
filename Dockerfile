@@ -15,7 +15,8 @@ RUN npm install
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
-ENV DATABASE_URL="postgresql://build:build@localhost:5432/build" # pragma: allowlist secret
+ARG DATABASE_URL_BUILD
+ENV DATABASE_URL=${DATABASE_URL_BUILD:-"postgresql://localhost/build"}
 RUN npm run build
 
 # Production image
