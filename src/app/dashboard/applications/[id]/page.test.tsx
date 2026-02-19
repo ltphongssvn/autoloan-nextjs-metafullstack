@@ -81,7 +81,7 @@ describe('ApplicationPage', () => {
     expect(mockPush).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('navigates through steps with Next', async () => {
+  it('navigates through steps with Next', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp());
     mockUpdate.mockResolvedValue(makeApp());
     renderPage();

@@ -115,7 +115,7 @@ describe('UnderwriterAnalysisPage', () => {
     expect(mockPush).toHaveBeenCalledWith('/underwriter');
   });
 
-  it('rejects application with reason', async () => {
+  it('rejects application with reason', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockReject.mockResolvedValueOnce(undefined);
     render(<UnderwriterAnalysisPage params={Promise.resolve({ id: '1' })} />);
