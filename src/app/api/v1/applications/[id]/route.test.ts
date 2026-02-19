@@ -76,3 +76,51 @@ describe('Applications [id] Route (Prisma)', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('Applications [id] - additional branch coverage', () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it('PATCH with minimal fields only updates provided ones', async () => {
+    mockGetUser.mockResolvedValueOnce(mockUser as never);
+    mockUpdate.mockResolvedValueOnce({ id: 1, status: 'draft' } as never);
+    const req = new NextRequest('http://localhost/api/v1/applications/1', { method: 'PATCH', body: JSON.stringify({ status: 'submitted' }) } as never);
+    const res = await PATCH(req, makeParams('1'));
+    expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      data: { status: 'submitted' },
+    }));
+  });
+
+  it('PATCH with empty body sends empty update', async () => {
+    mockGetUser.mockResolvedValueOnce(mockUser as never);
+    mockUpdate.mockResolvedValueOnce({ id: 1 } as never);
+    const req = new NextRequest('http://localhost/api/v1/applications/1', { method: 'PATCH', body: '{}' } as never);
+    const res = await PATCH(req, makeParams('1'));
+    expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: {} }));
+  });
+
+  it('PATCH with loan fields only', async () => {
+    mockGetUser.mockResolvedValueOnce(mockUser as never);
+    mockUpdate.mockResolvedValueOnce({ id: 1 } as never);
+    const req = new NextRequest('http://localhost/api/v1/applications/1', { method: 'PATCH', body: JSON.stringify({ loan_amount: 25000, down_payment: 5000, loan_term: 60, interest_rate: 6.5, monthly_payment: 450 }) } as never);
+    const res = await PATCH(req, makeParams('1'));
+    expect(res.status).toBe(200);
+  });
+
+  it('PATCH with signature and agreement fields', async () => {
+    mockGetUser.mockResolvedValueOnce(mockUser as never);
+    mockUpdate.mockResolvedValueOnce({ id: 1 } as never);
+    const req = new NextRequest('http://localhost/api/v1/applications/1', { method: 'PATCH', body: JSON.stringify({ signature_data: 'sig', agreement_accepted: true, signed_at: '2026-01-01' }) } as never);
+    const res = await PATCH(req, makeParams('1'));
+    expect(res.status).toBe(200);
+  });
+
+  it('PATCH with date fields only', async () => {
+    mockGetUser.mockResolvedValueOnce(mockUser as never);
+    mockUpdate.mockResolvedValueOnce({ id: 1 } as never);
+    const req = new NextRequest('http://localhost/api/v1/applications/1', { method: 'PATCH', body: JSON.stringify({ submitted_at: '2026-01-01', decided_at: '2026-01-02', rejection_reason: 'DTI too high', current_step: 3 }) } as never);
+    const res = await PATCH(req, makeParams('1'));
+    expect(res.status).toBe(200);
+  });
+});
