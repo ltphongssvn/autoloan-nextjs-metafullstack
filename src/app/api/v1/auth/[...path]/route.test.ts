@@ -1,100 +1,136 @@
 // autoloan-nextjs-metafullstack/src/app/api/v1/auth/[...path]/route.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
-import { GET, POST, PUT, PATCH, DELETE } from './route';
 
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    user: { findUnique: vi.fn(), findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
+    jwtDenylist: { create: vi.fn(), findFirst: vi.fn() },
+  },
+}));
+
+vi.mock('@/lib/auth', () => ({
+  verifyPassword: vi.fn(),
+  hashPassword: vi.fn(() => 'hashed'),
+  generateToken: vi.fn(() => 'jwt-token-123'),
+  verifyToken: vi.fn(() => ({ sub: '1', email: 'a@b.com', role: 'customer', jti: 'jti-1' })),
+}));
+
+import { GET, POST, PUT, PATCH, DELETE } from './route';
+import { prisma } from '@/lib/prisma';
+import { verifyPassword } from '@/lib/auth';
+
+const mockUserFind = vi.mocked(prisma.user.findUnique);
+const mockUserCreate = vi.mocked(prisma.user.create);
+const mockUserUpdate = vi.mocked(prisma.user.update);
+const mockUserFindFirst = vi.mocked(prisma.user.findFirst);
+const mockVerifyPw = vi.mocked(verifyPassword);
 
 const makeReq = (method: string, path: string, body?: string) => {
   const url = `http://localhost:3003/api/v1/auth/${path}`;
-  const init: { method: string; body?: string; headers?: Record<string, string> } = { method };
-  if (body) init.body = body;
-  return new NextRequest(url, init as never);
-};
-
-const mockRailsResponse = (status: number, data: object, headers?: Record<string, string>) => {
-  const resHeaders = new Headers({ 'Content-Type': 'application/json', ...headers });
-  return Promise.resolve(new Response(JSON.stringify(data), { status, headers: resHeaders }));
+  return new NextRequest(url, { method, body } as never);
 };
 
 const makeParams = (path: string[]) => Promise.resolve({ path });
 
-describe('Auth catch-all route', () => {
+const mockUser = {
+  id: 1, email: 'a@b.com',
+  encryptedPassword: 'hashed',  // pragma: allowlist secret
+  firstName: 'John', lastName: 'Doe', phone: '555', role: 'customer',
+  confirmedAt: new Date(), lockedAt: null, signInCount: 0, createdAt: new Date(),
+};
+
+describe('Auth catch-all route (Prisma)', () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it('POST /auth/login proxies to Rails', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { status: { code: 200 } }, { Authorization: 'Bearer jwt123' }));
-    const res = await POST(makeReq('POST', 'login', '{"user":{"email":"a@b.com"}}'), { params: makeParams(['login']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/login'), expect.anything());
+  it('POST /auth/login succeeds', async () => {
+    mockUserFind.mockResolvedValueOnce(mockUser as never);
+    mockVerifyPw.mockReturnValueOnce(true);
+    mockUserUpdate.mockResolvedValueOnce(mockUser as never);
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: { email: 'a@b.com', password: 'pw' } })), { params: makeParams(['login']) });
     expect(res.status).toBe(200);
-    expect(res.headers.get('Authorization')).toBe('Bearer jwt123');
+    expect(res.headers.get('Authorization')).toBe('Bearer jwt-token-123');
   });
 
-  it('POST /auth/signup proxies to Rails', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { status: { code: 200 } }));
-    const res = await POST(makeReq('POST', 'signup', '{}'), { params: makeParams(['signup']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/signup'), expect.anything());
-    expect(res.status).toBe(200);
+  it('POST /auth/login fails with wrong password', async () => {
+    mockUserFind.mockResolvedValueOnce(mockUser as never);
+    mockVerifyPw.mockReturnValueOnce(false);
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: { email: 'a@b.com', password: 'wrong' } })), { params: makeParams(['login']) });
+    expect(res.status).toBe(401);
   });
 
-  it('GET /auth/me proxies to Rails', async () => {
+  it('POST /auth/login fails with missing fields', async () => {
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: {} })), { params: makeParams(['login']) });
+    expect(res.status).toBe(422);
+  });
+
+  it('POST /auth/login fails for unconfirmed user', async () => {
+    mockUserFind.mockResolvedValueOnce({ ...mockUser, confirmedAt: null } as never);
+    mockVerifyPw.mockReturnValueOnce(true);
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: { email: 'a@b.com', password: 'pw' } })), { params: makeParams(['login']) });
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /auth/login fails for locked user', async () => {
+    mockUserFind.mockResolvedValueOnce({ ...mockUser, lockedAt: new Date() } as never);
+    mockVerifyPw.mockReturnValueOnce(true);
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: { email: 'a@b.com', password: 'pw' } })), { params: makeParams(['login']) });
+    expect(res.status).toBe(423);
+  });
+
+  it('POST /auth/signup succeeds', async () => {
+    mockUserFind.mockResolvedValueOnce(null);
+    mockUserCreate.mockResolvedValueOnce(mockUser as never);
+    const res = await POST(makeReq('POST', 'signup', JSON.stringify({ user: { email: 'new@b.com', password: 'pw', first_name: 'A', last_name: 'B', phone: '555' } })), { params: makeParams(['signup']) });
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Authorization')).toBe('Bearer jwt-token-123');
+  });
+
+  it('POST /auth/signup fails for existing email', async () => {
+    mockUserFind.mockResolvedValueOnce(mockUser as never);
+    const res = await POST(makeReq('POST', 'signup', JSON.stringify({ user: { email: 'a@b.com', password: 'pw', first_name: 'A', last_name: 'B', phone: '555' } })), { params: makeParams(['signup']) });
+    expect(res.status).toBe(422);
+  });
+
+  it('GET /auth/me returns user', async () => {
+    mockUserFind.mockResolvedValueOnce(mockUser as never);
     const req = makeReq('GET', 'me');
-    req.headers.set('authorization', 'Bearer token');
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { data: { id: 1 } }));
+    req.headers.set('authorization', 'Bearer valid');
     const res = await GET(req, { params: makeParams(['me']) });
     expect(res.status).toBe(200);
   });
 
-  it('DELETE /auth/logout proxies to Rails', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { status: { code: 200 } }));
-    const res = await DELETE(makeReq('DELETE', 'logout'), { params: makeParams(['logout']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/logout'), expect.anything());
-    expect(res.status).toBe(200);
-  });
-
-  it('PUT /auth/password proxies to Rails', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { status: { code: 200 } }));
-    const res = await PUT(makeReq('PUT', 'password', '{}'), { params: makeParams(['password']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/password'), expect.anything());
-    expect(res.status).toBe(200);
-  });
-
-  it('PATCH proxies to Rails', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, { status: { code: 200 } }));
-    const res = await PATCH(makeReq('PATCH', 'profile', '{}'), { params: makeParams(['profile']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/profile'), expect.anything());
-    expect(res.status).toBe(200);
-  });
-
-  it('forwards auth header to Rails', async () => {
-    const req = makeReq('POST', 'login', '{}');
-    req.headers.set('authorization', 'Bearer existing');
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, {}));
-    await POST(req, { params: makeParams(['login']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-      headers: expect.objectContaining({ Authorization: 'Bearer existing' }),
-    }));
-  });
-
-  it('handles nested paths', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, {}));
-    const res = await POST(makeReq('POST', 'mfa/setup', '{}'), { params: makeParams(['mfa', 'setup']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/auth/mfa/setup'), expect.anything());
-    expect(res.status).toBe(200);
-  });
-
-  it('forwards query params', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(200, {}));
-    const req = new NextRequest('http://localhost:3003/api/v1/auth/confirmation?confirmation_token=abc', { method: 'GET' } as never);
-    await GET(req, { params: makeParams(['confirmation']) });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('?confirmation_token=abc'), expect.anything());
-  });
-
-  it('returns response without auth header when Rails omits it', async () => {
-    mockFetch.mockReturnValueOnce(mockRailsResponse(401, { error: 'Invalid' }));
-    const res = await POST(makeReq('POST', 'login', '{}'), { params: makeParams(['login']) });
+  it('GET /auth/me fails without token', async () => {
+    const res = await GET(makeReq('GET', 'me'), { params: makeParams(['me']) });
     expect(res.status).toBe(401);
-    expect(res.headers.get('Authorization')).toBeNull();
+  });
+
+  it('DELETE /auth/logout succeeds', async () => {
+    const req = makeReq('DELETE', 'logout');
+    req.headers.set('authorization', 'Bearer valid');
+    const res = await DELETE(req, { params: makeParams(['logout']) });
+    expect(res.status).toBe(200);
+  });
+
+  it('POST /auth/password sends reset', async () => {
+    const res = await POST(makeReq('POST', 'password', JSON.stringify({ user: { email: 'a@b.com' } })), { params: makeParams(['password']) });
+    expect(res.status).toBe(200);
+  });
+
+  it('PUT /auth/password resets password', async () => {
+    mockUserFindFirst.mockResolvedValueOnce(mockUser as never);
+    mockUserUpdate.mockResolvedValueOnce(mockUser as never);
+    const res = await PUT(makeReq('PUT', 'password', JSON.stringify({ user: { reset_password_token: 'tok', password: 'new' } })), { params: makeParams(['password']) });
+    expect(res.status).toBe(200);
+  });
+
+  it('PATCH returns 404', async () => {
+    const res = await PATCH(makeReq('PATCH', 'anything', '{}'), { params: makeParams(['anything']) });
+    expect(res.status).toBe(404);
+  });
+
+  it('GET unknown path returns 404', async () => {
+    const res = await GET(makeReq('GET', 'unknown'), { params: makeParams(['unknown']) });
+    expect(res.status).toBe(404);
   });
 });

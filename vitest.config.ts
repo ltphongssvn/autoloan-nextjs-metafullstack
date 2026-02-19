@@ -34,6 +34,8 @@ export default defineConfig({
         'src/types/index.ts',
         // Prisma client singleton — runtime DB connector, not unit-testable
         'src/lib/prisma.ts',
+        // Server-side DB auth helper — requires real DB connection
+        'src/lib/apiAuth.ts',
       ],
       thresholds: {
         statements: 80,
