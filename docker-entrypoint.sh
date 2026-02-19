@@ -2,7 +2,7 @@
 set -e
 
 echo "Running Prisma migrations..."
-npx prisma db push --skip-generate --url "$DATABASE_URL"
+npx prisma db push --url "$DATABASE_URL"
 
 echo "Seeding database..."
 npx tsx prisma/seed.ts || echo "Seed skipped or already run"
