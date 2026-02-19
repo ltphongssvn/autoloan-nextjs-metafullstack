@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // autoloan-nextjs-metafullstack/src/app/api/v1/auth/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
