@@ -3,12 +3,14 @@ FROM node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
+RUN npm install -g npm@11.10.0
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 
 # Build the application
 FROM base AS builder
+RUN npm install -g npm@11.10.0
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
