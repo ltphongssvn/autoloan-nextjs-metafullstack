@@ -5,51 +5,30 @@ services:
     environment:
       - POSTGRES_USER=autoloan
       - POSTGRES_PASSWORD=localdevpassword123
-      - POSTGRES_DB=autoloan_production
+      - POSTGRES_DB=autoloan_nextjs
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U autoloan -d autoloan_production"]
+      test: ["CMD-SHELL", "pg_isready -U autoloan -d autoloan_nextjs"]
       interval: 5s
       timeout: 3s
       retries: 5
-
-  backend:
-    build:
-      context: ../autoloan
-      dockerfile: Dockerfile
-    environment:
-      - RAILS_ENV=production
-      - RAILS_LOG_TO_STDOUT=true
-      - DATABASE_URL=postgres://autoloan:localdevpassword123@db:5432/autoloan_production
-      - RAILS_MASTER_KEY=a4383b9a77d88343e2c0b52541c8a352
-      - DEVISE_JWT_SECRET_KEY=local-dev-jwt-secret-key-minimum-32-chars
-    ports:
-      - "3002:80"
-    depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/up"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - RAILS_API_URL=http://backend:80
+      - DATABASE_URL=postgresql://autoloan:localdevpassword123@db:5432/autoloan_nextjs
+      - JWT_SECRET=local-dev-jwt-secret-key-minimum-32-characters-long
       - NEXT_PUBLIC_API_URL=/api/v1
-      - NEXT_PUBLIC_WS_URL=ws://localhost:3002/cable
+      - NODE_ENV=production
     ports:
       - "3003:3001"
     depends_on:
-      backend:
+      db:
         condition: service_healthy
 
 volumes:
