@@ -2,7 +2,7 @@
 import { PrismaClient, Role, ApplicationStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient({});
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('Clearing existing data...');
