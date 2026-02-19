@@ -134,3 +134,74 @@ describe('Auth catch-all route (Prisma)', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('Auth catch-all - additional branch coverage', () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it('POST /auth/signup fails with missing fields', async () => {
+    const res = await POST(makeReq('POST', 'signup', JSON.stringify({ user: { email: 'a@b.com' } })), { params: makeParams(['signup']) });
+    expect(res.status).toBe(422);
+  });
+
+  it('POST /auth/refresh returns user', async () => {
+    mockUserFind.mockResolvedValueOnce(mockUser as never);
+    const req = makeReq('POST', 'refresh', '{}');
+    req.headers.set('authorization', 'Bearer valid');
+    const res = await POST(req, { params: makeParams(['refresh']) });
+    expect(res.status).toBe(200);
+  });
+
+  it('POST unknown route returns 404', async () => {
+    const res = await POST(makeReq('POST', 'unknown', '{}'), { params: makeParams(['unknown']) });
+    expect(res.status).toBe(404);
+  });
+
+  it('PUT /auth/password fails with missing fields', async () => {
+    const res = await PUT(makeReq('PUT', 'password', JSON.stringify({ user: {} })), { params: makeParams(['password']) });
+    expect(res.status).toBe(422);
+  });
+
+  it('PUT /auth/password fails with invalid token', async () => {
+    mockUserFindFirst.mockResolvedValueOnce(null);
+    const res = await PUT(makeReq('PUT', 'password', JSON.stringify({ user: { reset_password_token: 'bad', password: 'new' } })), { params: makeParams(['password']) });
+    expect(res.status).toBe(422);
+  });
+
+  it('PUT unknown route returns 404', async () => {
+    const res = await PUT(makeReq('PUT', 'other', '{}'), { params: makeParams(['other']) });
+    expect(res.status).toBe(404);
+  });
+
+  it('DELETE unknown route returns 404', async () => {
+    const res = await DELETE(makeReq('DELETE', 'other'), { params: makeParams(['other']) });
+    expect(res.status).toBe(404);
+  });
+
+  it('DELETE /auth/logout works without auth header', async () => {
+    const res = await DELETE(makeReq('DELETE', 'logout'), { params: makeParams(['logout']) });
+    expect(res.status).toBe(200);
+  });
+
+  it('GET /auth/me fails with invalid token', async () => {
+    const { verifyToken } = await import('@/lib/auth');
+    vi.mocked(verifyToken).mockImplementationOnce(() => { throw new Error('bad'); });
+    const req = makeReq('GET', 'me');
+    req.headers.set('authorization', 'Bearer invalid');
+    const res = await GET(req, { params: makeParams(['me']) });
+    expect(res.status).toBe(401);
+  });
+
+  it('GET /auth/me fails when user not found', async () => {
+    mockUserFind.mockResolvedValueOnce(null);
+    const req = makeReq('GET', 'me');
+    req.headers.set('authorization', 'Bearer valid');
+    const res = await GET(req, { params: makeParams(['me']) });
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /auth/login fails when user not found', async () => {
+    mockUserFind.mockResolvedValueOnce(null);
+    const res = await POST(makeReq('POST', 'login', JSON.stringify({ user: { email: 'x@b.com', password: 'pw' } })), { params: makeParams(['login']) });
+    expect(res.status).toBe(401);
+  });
+});
