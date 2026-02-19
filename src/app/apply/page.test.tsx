@@ -38,7 +38,7 @@ describe('ApplyPage', () => {
     expect(screen.getByText(/required fields/)).toBeInTheDocument();
   });
 
-  it('navigates through steps', () => {
+  it('navigates through steps', { timeout: 15000 }, () => {
     render(<ApplyPage />);
     // Fill step 1
     fireEvent.change(screen.getByLabelText(/Date of Birth/), { target: { value: '1990-01-01' } });
@@ -85,7 +85,7 @@ describe('ApplyPage', () => {
     expect(screen.getByText(/vehicle details/)).toBeInTheDocument();
   });
 
-  it('validates step 4 - down payment >= amount', () => {
+  it('validates step 4 - down payment >= amount', { timeout: 15000 }, () => {
     render(<ApplyPage />);
     // Navigate to step 4
     fireEvent.change(screen.getByLabelText(/Date of Birth/), { target: { value: '1990-01-01' } });

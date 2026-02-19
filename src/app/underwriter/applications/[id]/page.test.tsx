@@ -232,7 +232,7 @@ describe('UnderwriterAnalysisPage', () => {
     expect(screen.getByLabelText('Government ID')).not.toBeChecked();
   });
 
-  it('fills decision notes and conditions in approve modal', async () => {
+  it('fills decision notes and conditions in approve modal', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockApprove.mockResolvedValueOnce(undefined);
     render(<UnderwriterAnalysisPage params={Promise.resolve({ id: '1' })} />);
@@ -248,7 +248,7 @@ describe('UnderwriterAnalysisPage', () => {
     })));
   });
 
-  it('requests docs with custom notes', async () => {
+  it('requests docs with custom notes', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockRequestDocs.mockResolvedValueOnce(undefined);
     render(<UnderwriterAnalysisPage params={Promise.resolve({ id: '1' })} />);

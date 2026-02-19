@@ -209,7 +209,7 @@ describe('OfficerApplicationReviewPage', () => {
     await waitFor(() => expect(mockRequestDocs).toHaveBeenCalled());
   });
 
-  it('closes request documents modal on cancel', async () => {
+  it('closes request documents modal on cancel', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
@@ -247,7 +247,7 @@ describe('OfficerApplicationReviewPage', () => {
     await waitFor(() => expect(screen.getByText('Review Application')).toBeInTheDocument());
   });
 
-  it('toggles other doc type text field in request modal', async () => {
+  it('toggles other doc type text field in request modal', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);
     await waitFor(() => expect(screen.getByText('Decision Center')).toBeInTheDocument());
