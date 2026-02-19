@@ -47,8 +47,5 @@
     "happy-dom": "^20.6.2",
     "typescript": "^5",
     "vitest": "^4.0.18"
-  },
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
   }
 }
