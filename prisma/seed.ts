@@ -2,7 +2,8 @@
 import { PrismaClient, Role, ApplicationStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+// @ts-expect-error Prisma 7 runtime accepts datasourceUrl
+const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
 
 async function main() {
   console.log('Clearing existing data...');
