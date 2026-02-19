@@ -4,12 +4,9 @@ set -e
 echo "Running Prisma migrations..."
 npx prisma db push --url "$DATABASE_URL"
 
-echo "Generating Prisma client..."
-npx prisma generate
-
 echo "Seeding database..."
 node -e "
-  const { PrismaClient, Role, ApplicationStatus } = require('@prisma/client');
+  const { PrismaClient } = require('@prisma/client');
   const bcrypt = require('bcryptjs');
   const prisma = new PrismaClient({});
   async function main() {
