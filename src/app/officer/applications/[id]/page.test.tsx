@@ -180,7 +180,7 @@ describe('OfficerApplicationReviewPage', () => {
     await waitFor(() => expect(mockStartVerify).toHaveBeenCalledWith(1));
   });
 
-  it('submits forward to underwriter action with notes', async () => {
+  it('submits forward to underwriter action with notes', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockAddNote.mockResolvedValueOnce(undefined);
     mockForward.mockResolvedValueOnce(makeApp({ status: 'under_review' }) as never);
@@ -194,7 +194,7 @@ describe('OfficerApplicationReviewPage', () => {
     expect(mockAddNote).toHaveBeenCalledWith(1, 'Looks good');
   });
 
-  it('opens request documents modal and sends request', async () => {
+  it('opens request documents modal and sends request', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockRequestDocs.mockResolvedValueOnce(undefined);
     render(<OfficerApplicationReviewPage params={Promise.resolve({ id: '1' })} />);

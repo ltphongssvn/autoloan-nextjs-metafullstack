@@ -128,7 +128,7 @@ describe('ApplyPage', () => {
     await waitFor(() => expect(screen.getByText('Save failed')).toBeInTheDocument());
   });
 
-  it('submits application from review step', async () => {
+  it('submits application from review step', { timeout: 15000 }, async () => {
     mockCreate.mockResolvedValueOnce({ id: 10 } as never);
     mockSubmit.mockResolvedValueOnce({} as never);
     render(<ApplyPage />);

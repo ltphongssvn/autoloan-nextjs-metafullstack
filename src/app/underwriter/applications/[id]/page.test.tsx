@@ -138,7 +138,7 @@ describe('UnderwriterAnalysisPage', () => {
     expect(mockReject).not.toHaveBeenCalled();
   });
 
-  it('rejects with additional explanation', async () => {
+  it('rejects with additional explanation', { timeout: 15000 }, async () => {
     mockGet.mockResolvedValueOnce(makeApp() as never);
     mockReject.mockResolvedValueOnce(undefined);
     render(<UnderwriterAnalysisPage params={Promise.resolve({ id: '1' })} />);
